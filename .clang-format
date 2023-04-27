@@ -1,0 +1,15 @@
+BasedOnStyle: Google
+
+AccessModifierOffset: -4
+AlignTrailingComments: false
+AllowShortFunctionsOnASingleLine: Empty
+BreakBeforeBraces: Allman
+BinPackArguments: false
+BinPackParameters: false
+ColumnLimit: 100
+DerivePointerAlignment: false
+FixNamespaceComments: false
+IndentCaseLabels: false
+IndentWidth: 4
+NamespaceIndentation: All
+PointerAlignment: Right

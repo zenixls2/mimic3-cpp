@@ -1,0 +1,49 @@
+---
+Checks: "-*,
+         cppcoreguidelines-*,
+         -cppcoreguidelines-avoid-magic-numbers,
+         -cppcoreguidelines-owning-memory,
+         -cppcoreguidelines-pro-bounds-pointer-arithmetic,
+         -cppcoreguidelines-pro-type-reinterpret-cast,
+         google-*,
+         -google-readability-namespace-comments,
+         modernize-*,
+         -modernize-use-default-member-init,
+         -modernize-use-nodiscard,
+         -modernize-use-trailing-return-type,
+         portability-*,
+         readability-*,
+         -readability-magic-numbers,
+         -readability-redundant-member-init
+        "
+HeaderFilterRegex: ""
+AnalyzeTemporaryDtors: false
+CheckOptions:
+  # Set AllowSoleDefaultDtor to true... For interface definition.
+  - key:    cppcoreguidelines-special-member-functions.AllowSoleDefaultDtor
+    value:  'true'
+  # naming
+  - key:    readability-identifier-naming.ClassCase
+    value:  CamelCase
+  - key:    readability-identifier-naming.EnumCase
+    value:  CamelCase
+  - key:    readability-identifier-naming.MacroDefinitionCase
+    value:  UPPER_CASE
+  - key:    readability-identifier-naming.MemberCase
+    value:  camelBack
+  - key:    readability-identifier-naming.PrivateMemberSuffix
+    value:  '_'
+  - key:    readability-identifier-naming.ProtectedMemberSuffix
+    value:  '_'
+  - key:    readability-identifier-naming.MethodCase
+    value:  camelBack
+  - key:    readability-identifier-naming.NamespaceCase
+    value:  CamelCase
+  - key:    readability-identifier-naming.StructCase
+    value:  CamelCase
+  - key:    readability-identifier-naming.TypedefCase
+    value:  CamelCase
+  - key:    readability-identifier-naming.UnionCase
+    value:  CamelCase
+...
+

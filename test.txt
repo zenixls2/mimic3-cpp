@@ -1,0 +1,1 @@
+{"text": "Trump is the president of the United States", "output_path": "./out.wave", "mimic3": { "noise_scale": 0.067, "length_scale": 0.8, "noise_w": 0.1}}
