@@ -17,6 +17,16 @@ Download onnxruntime from github release page:
 
 may also refer: https://stackoverflow.com/questions/63420533/setting-up-onnx-runtime-on-ubuntu-20-04-c-api
 
+### Pretrained Model Download
+
+Check `https://github.com/MycroftAI/mimic3-voices/raw/master/voices/{lang}/{name}`. For example, the default voice should be `en_UK/apope_low`.
+Download the files and put it to `~/.local/share/mycroft/mimic3/voices/{lang}/{name}`.
+
+Or
+
+```bash
+pip install mycroft-mimic3-tts[all]
+```
 
 ### Launch:
 
