@@ -8,8 +8,6 @@ pkg_check_modules(JSONCPP REQUIRED jsoncpp)
 pkg_check_modules(SPDLOG REQUIRED spdlog)
 pkg_check_modules(SNDFILE REQUIRED sndfile)
 
-set(ONNXRUNTIME_ROOTDIR "/usr/local/include/onnxruntime")
-
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
@@ -26,7 +24,6 @@ target_link_directories(mimic3 PUBLIC
                         ${ONNXRUNTIME_ROOTDIR}/lib)
 
 target_include_directories(mimic3 PUBLIC
-                           ${ONNXRUNTIME_ROOTDIR}/include
                            ${ESPEAK_NG_INCLUDE_DIRS}
                            ${JSONCPP_INCLUDE_DIRS}
                            ${SPDLOG_INCLUDE_DIRS}
