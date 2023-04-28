@@ -73,5 +73,5 @@ Hello World!
 ### Play sound
 
 ```bash
-aplay ./out.wav
+aplay ./0.wav
 ```
