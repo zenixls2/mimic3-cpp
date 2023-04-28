@@ -28,16 +28,46 @@ Or
 pip install mycroft-mimic3-tts[all]
 ```
 
-### Launch:
+### Compile
 
 ```bash
-./mimic3/mimic3 ~/.local/share/mycroft/mimic3/voices/en_UK/apope_low/generator.onnx .
+mkdir build
+cd build && cmake .. && make -j
+```
+
+### Launch
+
+```bash
+./mimic3/mimic3
+```
+
+### Usage
+
+```
+mimic3 [-h] [--language LANG] [--noise-scale NOISE_SCALE] [--length-scale LENGTH_SCALE] [--noise-w NOISE_W] [--vocie VOICE] [--voices-dir VOICES_DIR] [--voices] [--output-dir OUTPUT_DIR] [--output-naming {text,time,id}]
+
+Mimic 3 commad-line interface
+positional arguments:
+
+optional arguments:
+  -h, --help: show this help message and exit
+  --language LANG: language abbreviation pass to espeak-ng, default is en
+      Check: https://github.com/espeak-ng/espeak-ng/blob/master/docs/languages.md
+  --voice VOICE, -v VOICE: Name of voice (expected in <voices-dir>/<language>)
+  --voice-dir VOICE: Directory with voices (format is <language>/<voice_name>)
+  --vocies: List available voices
+  --output-dir OUTPUT_DIR: Directory to write WAV file(s)
+  --output-naming {text,time,id}: Naming scheme for output WAV files
+  --id-delimiter ID_DELIMITER: Delimiter between id and text in lines (default: |)
+  --length-scale LENGTH_SCALE: Length scale (1.0 is default speed, 0.5 is 2x faster)
+  --noise-scale NOISE_SCALE: Noise scale [0-1], default is 0.667
+  --noise-w NOISE_W: Variation in cadence [0-1], default is 0.8
 ```
 
 ### Prompt:
 
-```json
-{"text": "Hello World", "output_path": "./out.wav", "mimic3": { "noise_scale": 0.067, "length_scale": 1.0, "noise_w": 0.2}}
+```
+Hello World!
 ```
 
 ### Play sound
