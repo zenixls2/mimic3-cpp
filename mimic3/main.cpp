@@ -16,38 +16,33 @@
 #include <string_view>
 #include <vector>
 
+#include "params.hpp"
 #include "phonemize.hpp"
 #include "synthesize.hpp"
 
 using namespace std;
-
-void printHelp()
-{
-    std::cout << "mimic3 <model> [output_dir]" << std::endl;
-}
 
 int main(int argc, char *argv[])
 {
     // Log to stderr instead of stdout
     spdlog::set_default_logger(spdlog::stderr_color_st("mimic3"));
     spdlog::set_level(spdlog::level::debug);
-
-    if (argc < 2)
+    auto params = mimic3::params(argc, argv);
+    if (!params.check())
     {
-        printHelp();
-        return EXIT_SUCCESS;
+        spdlog::error("parameter check failed.");
+        exit(EXIT_FAILURE);
     }
 
-    std::filesystem::path modelPath(argv[1]);
-    std::optional<std::filesystem::path> outputDirectory;
+    std::filesystem::path modelPath = params.getModelPath();
+    std::filesystem::path outputDirectory;
 
-    if (argc > 2)
-    {
-        // Output directory for WAV files
-        outputDirectory = std::filesystem::path(argv[2]);
-        spdlog::debug("Creating output directory: {}", outputDirectory.value().string());
-        std::filesystem::create_directories(outputDirectory.value());
-    }
+    spdlog::debug("Use modelPath: {}", modelPath.string());
+
+    // Output directory for WAV files
+    outputDirectory = std::filesystem::path(params.output_dir.c_str());
+    spdlog::debug("Creating output directory: {}", outputDirectory.string());
+    std::filesystem::create_directories(outputDirectory);
 
     // Verify model file exists
     std::ifstream modelFile(modelPath.c_str(), ios::binary);
@@ -59,8 +54,7 @@ int main(int argc, char *argv[])
 
     // Load phoneme map
     std::optional<mimic3::PhonemeIdMap> idMap;
-    // std::filesystem::path idMapPath = modelPath.parent_path() / "phoneme_id_map.json";
-    std::filesystem::path idMapPath = modelPath.parent_path() / "phonemes.txt";
+    /*std::filesystem::path idMapPath = modelPath.parent_path() / "phoneme_map.txt";
     std::ifstream idMapFile(idMapPath.c_str());
     if (idMapFile.good())
     {
@@ -72,6 +66,19 @@ int main(int argc, char *argv[])
     else
     {
         spdlog::warn("Missing phoneme id map: {}", idMapPath.string());
+    }*/
+    auto idPath = modelPath.parent_path() / "phonemes.txt";
+    std::ifstream idFile(idPath.c_str());
+    if (idFile.good())
+    {
+        spdlog::debug("Loading phoneme id: {}", idPath.string());
+        idMap.emplace();
+        mimic3::loadPhonemeIdMap(idFile, &idMap.value());
+        spdlog::info("Loaded phoneme id");
+    }
+    else
+    {
+        spdlog::warn("Missing phoneme id: {}", idPath.string());
     }
 
     // Initialize
@@ -80,43 +87,27 @@ int main(int argc, char *argv[])
 
     // -----------
 
-    // Read lines of JSON from standard input.
-    // Format:
-    // { "text": "Text to synthesize", "mimic3": { "output_path": "/optional/path/to/file.wav" } }
-    //
+    // Read lines from standard input.
     std::size_t lineIndex = 0;
     std::string line;
     while (getline(std::cin, line))
     {
-        std::stringstream lineStream(line);
         mimic3::mimic3_Request request;
-        mimic3::parseRequest(lineStream, request);
+        request.text = line;
+        request.voice = params.language;
+        request.noiseScale = params.noise_scale;
+        request.lengthScale = params.length_scale;
+        request.noiseW = params.noise_w;
+        if (params.output_naming.empty())
+        {
+            request.outputPath = outputDirectory / params.output_naming;
+        }
+        else
+        {
+            request.outputPath = outputDirectory / (std::to_string(lineIndex) + ".wav");
+        }
         mimic3::phonemize(request);
         mimic3::phonemes2ids(request, idMap);
-
-        if (!request.outputPath)
-        {
-            // Path to output WAV file
-            std::stringstream outputName;
-            outputName << lineIndex << ".wav";
-
-            if (outputDirectory.has_value())
-            {
-                // Relative to output directory
-                request.outputPath = outputDirectory;
-                request.outputPath.value().append(outputName.str());
-            }
-            else
-            {
-                // Relative to current directory
-                request.outputPath = std::filesystem::path(outputName.str());
-            }
-        }
-
-        if (!request.outputPath)
-        {
-            throw std::runtime_error("No output path for audio");
-        }
 
         auto phonemeIds = &request.phonemeIds.value();
         if (phonemeIds->empty())
@@ -126,7 +117,7 @@ int main(int argc, char *argv[])
 
         spdlog::debug("Synthesizing audio with {} phoneme id(s)", phonemeIds->size());
         auto result = synthesize(session,
-                                 request.outputPath.value(),
+                                 request.outputPath,
                                  phonemeIds,
                                  request.noiseScale,
                                  request.lengthScale,
@@ -138,7 +129,7 @@ int main(int argc, char *argv[])
                      result.inferSeconds,
                      result.audioSeconds);
 
-        spdlog::info("Wrote {}", request.outputPath.value().string());
+        spdlog::info("Wrote {}", request.outputPath.string());
         lineIndex++;
 
         std::cout << line << std::endl;

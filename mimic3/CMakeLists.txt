@@ -11,7 +11,9 @@ pkg_check_modules(SNDFILE REQUIRED sndfile)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-ADD_EXECUTABLE(mimic3 main.cpp)
+ADD_EXECUTABLE(mimic3 main.cpp params.cpp)
+
+set(ONNXRUNTIME_ROOTDIR /usr/)
 
 target_link_libraries(mimic3
                       onnxruntime
@@ -27,7 +29,8 @@ target_include_directories(mimic3 PUBLIC
                            ${ESPEAK_NG_INCLUDE_DIRS}
                            ${JSONCPP_INCLUDE_DIRS}
                            ${SPDLOG_INCLUDE_DIRS}
-                           ${SNDFILE_INCLUDE_DIRS})
+                           ${SNDFILE_INCLUDE_DIRS}
+			   ${ONNXRUNTIME_ROOTDIR}/include)
 
 target_compile_options(mimic3 PUBLIC
                        ${ESPEAK_NG_CFLAGS_OTHER}

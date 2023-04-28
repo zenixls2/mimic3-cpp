@@ -34,11 +34,23 @@ namespace mimic3
         std::string phoneme;
         while (inputStream.good())
         {
-            inputStream >> id >> phoneme;
-            spdlog::info("output id: {}, phoneme: {}", id, phoneme);
-            utf8::iterator character_iter(phoneme.begin(), phoneme.begin(), phoneme.end());
-            auto codepoint = *character_iter;
-            (*idMap)[codepoint].push_back(id);
+            std::string line;
+            std::getline(inputStream, line);
+            std::istringstream line_input;
+            line_input.str(line);
+            line_input >> id;
+            if (!line_input.good())
+            {
+                (*idMap)[' '].push_back(id);
+            }
+            while (line_input.good())
+            {
+                line_input >> phoneme;
+                spdlog::info("output id: {}, phoneme: {}", id, phoneme);
+                utf8::iterator character_iter(phoneme.begin(), phoneme.begin(), phoneme.end());
+                auto codepoint = *character_iter;
+                (*idMap)[codepoint].push_back(id);
+            }
         }
     }
 
@@ -68,7 +80,7 @@ namespace mimic3
         std::string voice;
         std::optional<std::vector<char32_t>> phonemes;
         std::optional<std::vector<int64_t>> phonemeIds;
-        std::optional<std::filesystem::path> outputPath;
+        std::filesystem::path outputPath;
         float noiseScale = 0.667f;
         float lengthScale = 1.0f;
         float noiseW = 0.8f;
@@ -214,7 +226,7 @@ namespace mimic3
         {
             std::string clausePhonemes(espeak_TextToPhonemes((const void **)&inputTextPointer,
                                                              /*textmode*/ espeakCHARS_AUTO,
-                                                             /*phonememode = IPA*/ 0x02));
+                                                             /*phonememode = IPA*/ 0x03));
 
             spdlog::debug("Phonemes: {}", clausePhonemes);
 
